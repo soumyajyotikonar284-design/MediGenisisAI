@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediGenisis® AI - Professional Medical Assistant</title>
+    <style>
+        :root {
+            --bg: #f4f7fa;
+            --text: #333;
+            --card: #ffffff;
+            --border: #e0e0e0;
+            --primary: #007bff;
+            --hover: #0056b3;
+            --shadow: rgba(0,0,0,0.05);
+            --input-bg: #fff;
+        }
+        body.dark {
+            --bg: #121212;
+            --text: #e0e0e0;
+            --card: #1e1e1e;
+            --border: #333;
+            --primary: #0d6efd;
+            --hover: #0a58ca;
+            --shadow: rgba(0,0,0,0.3);
+            --input-bg: #2d2d2d;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        .sidebar {
+            width: 280px;
+            background: var(--card);
+            padding: 20px;
+            border-right: 1px solid var(--border);
+            box-shadow: 2px 0 10px var(--shadow);
+            overflow-y: auto;
+        }
+        .theme-toggle {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .theme-toggle button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .sidebar h2 {
+            font-size: 1.2em;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .tool-item {
+            background: var(--input-bg);
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-size: 0.95em;
+        }
+        .tool-item:hover {
+            background: var(--border);
+        }
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 30px;
+            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: var(--primary);
+            margin: 0;
+        }
+        .description {
+            font-size: 1.1em;
+            color: var(--text);
+            opacity: 0.8;
+            margin-bottom: 30px;
+        }
+        .input-area {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+        }
+        #disease-input {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1em;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+        #submit-btn {
+            padding: 14px 24px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background 0.3s;
+            align-self: flex-start;
+        }
+        #submit-btn:hover {
+            background: var(--hover);
+        }
+        #suggestions {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 20px 0;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            box-shadow: 0 4px 10px var(--shadow);
+        }
+        #suggestions li {
+            padding: 14px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+        }
+        #suggestions li:last-child {
+            border-bottom: none;
+        }
+        #suggestions li:hover {
+            background: var(--primary);
+            color: white;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 25px;
+            background: var(--card);
+            border-radius: 10px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 4px 10px var(--shadow);
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        .disclaimer {
+            font-size: 0.9em;
+            color: #888;
+            margin-top: 30px;
+            font-style: italic;
+            text-align: center;
+            opacity: 0.8;
+        }
+        .footer {
+            margin-top: auto;
+            padding-top: 30px;
+            text-align: center;
+            font-size: 0.9em;
+            color: var(--text);
+            opacity: 0.7;
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .main {
+                padding: 20px;
+            }
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="theme-toggle">
+            <button id="theme-btn">🌙 Dark Mode</button>
+        </div>
+        <h2>🧰 Medical Toolbox</h2>
+        <div class="tool-item" onclick="quickQuery('Diabetes')">Diabetes</div>
+        <div class="tool-item" onclick="quickQuery('Hypertension')">Hypertension</div>
+        <div class="tool-item" onclick="quickQuery('Migraine')">Migraine</div>
+        <div class="tool-item" onclick="quickQuery('Asthma')">Asthma</div>
+        <div class="tool-item" onclick="quickQuery('Alzheimer\'s Disease')">Alzheimer's Disease</div>
+        <div class="tool-item" onclick="quickQuery('Breast Cancer')">Breast Cancer</div>
+        <div class="tool-item" onclick="quickQuery('Depression')">Depression</div>
+        <div class="tool-item" onclick="quickQuery('Flu')">Flu</div>
+    </div>
+    <div class="main">
+        <div class="header">
+            <h1>MediGenisis® 🧬</h1>
+        </div>
+        <p class="description">Your professional AI-powered medical assistant. Enter symptoms or diseases for general insights, including common medications.</p>
+        <div class="input-area">
+            <input type="text" id="disease-input" placeholder="e.g., headache, diabetes, chest pain...">
+            <ul id="suggestions"></ul>
+            <button id="submit-btn">Get Insights</button>
+        </div>
+        <div id="output">Enter a query above to receive information.</div>
+        <p class="disclaimer">⚠️ Disclaimer: MediGenisis® provides general information only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. Always consult a qualified healthcare provider. Medication details are examples and may vary by individual.</p>
+        <div class="footer">
+            Created by Soumyajyoti Konar – Owner of SomuAI © 2025
+        </div>
+    </div>
+
+    <script>
+        const diseases = [
+            "Diabetes", "Hypertension", "COVID-19", "Headache", "Flu", "Asthma", "Alzheimer's Disease", "Lung Cancer", "Breast Cancer",
+            "Autoimmune Disorder", "Heart Disease", "Migraine", "Arthritis", "Depression", "Anxiety", "Obesity", "Bronchitis",
+            "Allergic Rhinitis", "Cataracts", "Hemorrhoids", "Hay Fever", "Head Lice", "Hearing Loss", "Heart Attack",
+            "Benign Prostatic Hyperplasia", "Dental Caries", "Dengue Fever", "Campylobacteriosis", "Babesiosis", "Angina",
+            "Chronic Kidney Disease", "COPD", "Epilepsy", "Gout", "Hepatitis", "HIV/AIDS", "Inflammatory Bowel Disease",
+            "Leukemia", "Lyme Disease", "Malaria", "Multiple Sclerosis", "Osteoporosis", "Parkinson's Disease", "Pneumonia",
+            "Rheumatoid Arthritis", "Schizophrenia", "Stroke", "Thyroid Disease", "Tuberculosis", "Urinary Tract Infection",
+            "Varicose Veins", "Zika Virus"
+        ];
+
+        const treatments = {
+            "diabetes": "Common management: Oral medications like Metformin, GLP-1 agonists (e.g., Semaglutide), or Insulin therapy. Includes blood sugar monitoring, healthy diet, and exercise.",
+            "hypertension": "Medications such as ACE inhibitors (e.g., Lisinopril), Beta-blockers (e.g., Metoprolol), Calcium channel blockers (e.g., Amlodipine), or Diuretics. Lifestyle changes and regular monitoring essential.",
+            "covid-19": "Supportive care, vaccination. Antivirals like Paxlovid (Nirmatrelvir/Ritonavir) or Remdesivir for eligible high-risk cases. Rest and hydration key.",
+            "headache": "Over-the-counter options like Ibuprofen, Acetaminophen, or Aspirin. For migraines: Triptans (e.g., Sumatriptan). Identify triggers.",
+            "flu": "Antivirals like Oseltamivir (Tamiflu). Symptom relief with Acetaminophen or Ibuprofen. Rest, fluids, and annual vaccination.",
+            "asthma": "Inhalers: Short-acting like Albuterol; Long-term control with Inhaled corticosteroids (e.g., Fluticasone). Avoid triggers and follow action plan.",
+            "alzheimer's disease": "Medications like Donepezil, Rivastigmine, or Memantine to manage symptoms. Cognitive support and caregiver resources.",
+            "cancer": "Varies by type: Chemotherapy, Radiation, Surgery, Immunotherapy, or Targeted therapies (e.g., for breast cancer: Tamoxifen or Herceptin).",
+            "breast cancer": "Options: Surgery, Radiation, Chemotherapy, Hormone therapy (e.g., Tamoxifen), or Targeted drugs (e.g., Trastuzumab).",
+            "heart disease": "Statins (e.g., Atorvastatin) for cholesterol, Aspirin for prevention, Beta-blockers, or procedures like angioplasty.",
+            "migraine": "Acute: Triptans (e.g., Sumatriptan); Preventive: Beta-blockers, Antidepressants (e.g., Amitriptyline), or CGRP inhibitors (e.g., Erenumab).",
+            "arthritis": "NSAIDs (e.g., Ibuprofen), DMARDs like Methotrexate for rheumatoid, or Biologics (e.g., Adalimumab). Physical therapy helpful.",
+            "depression": "Antidepressants like SSRIs (e.g., Sertraline, Fluoxetine). Psychotherapy and lifestyle changes.",
+            "anxiety": "SSRIs/SNRIs (e.g., Escitalopram), Benzodiazepines (short-term, e.g., Lorazepam), or Therapy like CBT.",
+            "bronchitis": "Often supportive; Antibiotics (e.g., Azithromycin) if bacterial. Cough suppressants and rest.",
+        };
+
+        const input = document.getElementById('disease-input');
+        const suggestions = document.getElementById('suggestions');
+        const output = document.getElementById('output');
+        const submitBtn = document.getElementById('submit-btn');
+        const themeBtn = document.getElementById('theme-btn');
+
+        // Theme Toggle
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            if (document.body.classList.contains('dark')) {
+                themeBtn.textContent = '☀️ Light Mode';
+            } else {
+                themeBtn.textContent = '🌙 Dark Mode';
+            }
+        });
+
+        // Autocomplete Suggestions
+        function showSuggestions() {
+            const query = input.value.trim().toLowerCase();
+            suggestions.innerHTML = '';
+            if (query.length === 0) return;
+
+            const matches = diseases
+                .filter(d => d.toLowerCase().includes(query))
+                .slice(0, 8);
+
+            matches.forEach(match => {
+                const li = document.createElement('li');
+                li.innerHTML = match.replace(new RegExp(query, 'gi'), '<strong>$&</strong>');
+                li.onclick = () => {
+                    input.value = match;
+                    suggestions.innerHTML = '';
+                    getTreatment();
+                };
+                suggestions.appendChild(li);
+            });
+        }
+
+        // Get Treatment Insights
+        function getTreatment() {
+            const query = input.value.trim();
+            if (!query) {
+                output.innerHTML = 'Please enter a symptom or disease.';
+                return;
+            }
+
+            let response = `<strong>Query:</strong> ${query}<br><br>`;
+            let found = false;
+
+            const lowerQuery = query.toLowerCase();
+            for (let key in treatments) {
+                if (lowerQuery.includes(key)) {
+                    response += `<strong>General Insights & Common Medications:</strong> ${treatments[key]}<br><br>`;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                response += `General advice for "${query}": Monitor symptoms, stay hydrated, and rest. Over-the-counter options may help mild cases, but seek professional care for accurate diagnosis.<br><br>`;
+            }
+
+            response += `<em>Remember: This is general info only. Medications require prescription and doctor supervision. Consult a healthcare provider!</em>`;
+            output.innerHTML = response;
+        }
+
+        // Quick Query from Toolbox
+        function quickQuery(term) {
+            input.value = term;
+            showSuggestions();
+            getTreatment();
+        }
+
+        // Event Listeners
+        input.addEventListener('input', showSuggestions);
+        submitBtn.addEventListener('click', getTreatment);
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getTreatment();
+            }
+        });
+    </script>
+</body>
+</html>
